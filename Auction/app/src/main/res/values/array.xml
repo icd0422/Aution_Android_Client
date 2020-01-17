@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="product_category_array">
+        <item>자동차</item>
+        <item>골동품</item>
+        <item>약물</item>
+        <item>여행</item>
+        <item>생활용품</item>
+    </string-array>
+</resources>
