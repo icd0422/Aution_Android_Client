@@ -17,7 +17,7 @@ import com.android.volley.*;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.auction.AppHelper;
-import com.example.auction.main.MainActivity;
+import com.example.auction.MainActivity;
 import com.example.auction.R;
 import com.example.auction.product.item.ImageInfo;
 import com.example.auction.product.type.ProductStatus;

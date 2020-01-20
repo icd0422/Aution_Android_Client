@@ -1,19 +1,13 @@
-package com.example.auction.main;
+package com.example.auction;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-
-import com.example.auction.AppHelper;
-import com.example.auction.R;
-import com.example.auction.product.fragment.ProductFragment;
-import com.example.auction.product.fragment.ProductFragments;
 import com.google.android.material.tabs.TabLayout;
 
 import java.io.InputStream;
@@ -31,22 +25,20 @@ public class MainActivity extends AppCompatActivity {
 
         token = getIntent().getStringExtra("token");
         email = getIntent().getStringExtra("email");
-
-        //AppHelper.TOKEN = token;
+        AppHelper.TOKEN = token;
 
         androidx.appcompat.widget.Toolbar toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
-
-        tabs.addTab(tabs.newTab().setText(Tabs.PRODUCT_FRAGMENT_ALL.getText()));
-        tabs.addTab(tabs.newTab().setText(Tabs.PRODUCT_FRAGMENT_MY.getText()));
-        tabs.addTab(tabs.newTab().setText(Tabs.BID_MY.getText()));
-        tabs.addTab(tabs.newTab().setText(Tabs.PRODUCT_FRAGMENT_REGISTER.getText()));
+        tabs.addTab(tabs.newTab().setText("전체 상품"));
+        tabs.addTab(tabs.newTab().setText("내가 올린 상품"));
+        tabs.addTab(tabs.newTab().setText("나의 입찰 내역"));
+        tabs.addTab(tabs.newTab().setText("상품 등록"));
 
         AppHelper.PRODUCT_FRAGMENT_ALL.setEmail(email);
 
-        getSupportFragmentManager().beginTransaction().add(R.id.container, ProductFragments.PRODUCT_FRAGMENT_ALL.getFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.container, AppHelper.PRODUCT_FRAGMENT_ALL).commit();
 
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -55,14 +47,12 @@ public class MainActivity extends AppCompatActivity {
 
                 Fragment selectedFragment = null;
 
-                if (position == Tabs.PRODUCT_FRAGMENT_ALL.getNum()) {
-                    selectedFragment = ProductFragments.PRODUCT_FRAGMENT_ALL.getFragment();
-                } else if (position == Tabs.PRODUCT_FRAGMENT_MY.getNum()) {
-                    selectedFragment = ProductFragments.PRODUCT_FRAGMENT_MY.getFragment();
-                } else if (position == Tabs.BID_MY.getNum()) {
-
-                } else if (position == Tabs.PRODUCT_FRAGMENT_REGISTER.getNum()) {
-                    selectedFragment = ProductFragments.PRODUCT_FRAGMENT_REGISTER.getFragment();
+                if (position == 0) {
+                    selectedFragment = AppHelper.PRODUCT_FRAGMENT_ALL;
+                } else if (position == 1) {
+                    selectedFragment = AppHelper.PRODUCT_FRAGMENT_MY;
+                } else if (position == 3) {
+                    selectedFragment = AppHelper.PRODUCT_FRAGMENT_REGISTER;
                 } else return;
 
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, selectedFragment).commit();
@@ -80,13 +70,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void callGallery() {
+    public void callGallery(){
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, AppHelper.GET_IMAGE_REQUEST);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

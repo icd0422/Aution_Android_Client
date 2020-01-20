@@ -1,22 +1,30 @@
 package com.example.auction.product.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
+import com.android.volley.*;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.auction.AppHelper;
+import com.example.auction.MainActivity;
 import com.example.auction.R;
-import com.example.auction.main.MainActivity;
+import com.example.auction.product.item.Product;
 import com.example.auction.product.item.ProductList;
 import com.example.auction.product.list.ProductAdapter;
-import com.example.auction.request.VolleyRequest;
+import com.example.auction.product.type.ProductStatus;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProductFragment extends Fragment {
 
@@ -24,20 +32,22 @@ public class ProductFragment extends Fragment {
     private ListView productListView;
     private ProductAdapter productAdapter;
 
+    private RequestQueue requestQueue;
+
     private MainActivity parentActivity;
 
     private String token;
 
-    private int what;
+    private int rq  ;
 
-    private String email;
+    private String email ;
 
-    public ProductFragment(int what) {
-        this.what = what;
+    public ProductFragment(int rq){
+        this.rq = rq ;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmail(String email){
+        this.email = email ;
     }
 
     @Nullable
@@ -53,26 +63,77 @@ public class ProductFragment extends Fragment {
 
         productListView = (ListView) rootView.findViewById(R.id.lv_products);
         productAdapter = new ProductAdapter(parentActivity);
-        productAdapter.setToken(token, );
+        productAdapter.setToken(token, rq);
 
-        VolleyRequest.productListRequest(parentActivity, what, token, email);
+        requestQueue = Volley.newRequestQueue(parentActivity);
 
-
+        productListRequest();
 
         return rootView;
     }
 
-    public void refreshProductListView(ProductList productList){
-
-        productAdapter.setItems(productList.getProducts());
-        productListView.setAdapter(null);
-        productListView.setAdapter(productAdapter);
-
+    public void renew(){
+        productListRequest();
     }
 
-    public void renew() {
-        VolleyRequest.productListRequest(parentActivity, what, token, email);
+    void productListRequest() {
+        String url =  null ;
+        if(rq == AppHelper.PRODUCT_VIEW_ALL) url = AppHelper.URL + "/product";
+        else if(rq == AppHelper.PRODUCT_VIEW_MY) url = AppHelper.URL + "/user/my/product";
+
+        StringRequest request = new StringRequest(
+                Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        processResponse(response);
+
+                        ArrayList<Product> products = productList.getProducts() ;
+
+                        Log.d("jjh", products.toString());
+
+                        if(rq==AppHelper.PRODUCT_VIEW_ALL){
+                            int size = products.size();
+                            for(int i=0 ; i<size ; i++){
+                                if(products.get(i).getStatus() >= ProductStatus.PRODUCT_COMPELETE.getState() || products.get(i).getUserEmail().equals(email)){
+                                    products.remove(i);
+                                    i--;
+                                    size--;
+                                }
+                            }
+                        }
+
+                        productAdapter.setItems(products);
+                        productListView.setAdapter(null);
+                        productListView.setAdapter(productAdapter);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Authorization", token);
+
+                return params;
+            }
+        };
+
+        request.setShouldCache(false);
+        requestQueue.add(request);
+        if (AppHelper.DEBUG)
+            Toast.makeText(getActivity().getApplicationContext(), "productListRequest()", Toast.LENGTH_LONG).show();
     }
 
-
+    public void processResponse(String response) {
+        Gson gson = new Gson();
+        productList = gson.fromJson(response, ProductList.class);
+        if (AppHelper.DEBUG) productList.print();
+    }
 }

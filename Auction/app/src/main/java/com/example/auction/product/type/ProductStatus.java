@@ -7,6 +7,7 @@ public enum ProductStatus {
     PRODUCT_READY(-1, Color.GREEN, "준비중"),
     PRODUCT_ING(0, Color.BLUE, "경매중"),
     PRODUCT_COMPELETE(1, Color.RED, "완료");
+    ;
 
     private final int state ;
     private final int color;
