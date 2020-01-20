@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/background_light"
-    tools:context=".LoginActivity">
+    tools:context=".login.LoginActivity">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -26,11 +26,11 @@
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="아이디"
+                android:text="이메일"
                 android:textSize="19dp" />
 
             <EditText
-                android:id="@+id/tv_id"
+                android:id="@+id/tv_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
